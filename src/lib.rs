@@ -6,7 +6,6 @@ pub mod io;
 
 use io::cli::init_cli;
 
-
 pub fn run() {
     init_cli();
 }

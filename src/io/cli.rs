@@ -15,7 +15,7 @@ fn open_main_menu(){
     ");
     match process_choice(3) {
         1 => {
-            //Invoke API, Start Calculations etc.
+            //TODO Invoke API, Start Calculations etc.
         }
         2 => open_configuration_menu(),
         3 => exit(0),
@@ -34,14 +34,34 @@ fn open_configuration_menu() {
     ");
     match process_choice(5) {
         1 => {
+            println!("Please type a year between 1950 and 2025:");
             input_championship_year();
+            println!("\nChampionship year configuration saved successfully");
+            //TODO Save data
+            open_configuration_menu();
         },
-        2 => println!("Select a point system"),
+        2 => {
+            open_point_system_config();
+        },
         3 => println!("Importing point system..."),
-        4 => println!("Current Settings: ???" ),
+        4 => {
+            println!("Current Settings: ???" );
+            open_configuration_menu();
+        },
         5 => open_main_menu(),
         _ => println!("Invalid data")
     }
+}
+
+fn open_point_system_config(){
+    println!("\
+            Please select an existing point system:\n\
+            [1] - Modern system\n\
+            [2] - Modern system (+Fastest Lap Point)\n\
+            [3] - 2003-2009\n\
+            [4] - 1991–2002
+    ");
+    //TODO Check GP point-system input and verify sprint point-systems
 }
 
 fn input_championship_year() -> u16{
@@ -54,7 +74,6 @@ fn input_championship_year() -> u16{
         };
     }
 }
-
 fn process_choice(max_value: u8) -> u8{
     loop{
         let mut choice = String::new();

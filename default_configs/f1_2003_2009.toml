@@ -1,0 +1,15 @@
+fastest_lap_point = 0
+pole_point = 0
+
+[gp_point_allocation]
+1 = 10
+2 = 8
+3 = 6
+4 = 5
+5 = 4
+6 = 3
+7 = 2
+8 = 1
+
+[sprint_point_allocation]
+1 = 0

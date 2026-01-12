@@ -1,5 +1,5 @@
 pub mod model;
-pub mod championship;
+pub mod service;
 pub mod api;
 pub mod io;
 

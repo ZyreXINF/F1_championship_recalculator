@@ -2,13 +2,16 @@ use std::process::exit;
 use crate::model::app_state::AppState;
 use crate::io::cli_input;
 use crate::io::config_parser;
+use crate::api::data_parser;
+use crate::service::calculator::recalculate_championship;
 
-pub fn init_cli(state: &mut AppState) {
+#[tokio::main]
+pub async fn init_cli(state: &mut AppState) {
     println!("\nWelcome to F1 Championship Calculator");
-    open_main_menu(state);
+    open_main_menu(state).await;
 }
 
-fn open_main_menu(state: &mut AppState){
+async fn open_main_menu(state: &mut AppState){
     println!(
         "\nPlease select an option:\n\
         [1] - Start recalculation\n\
@@ -18,14 +21,29 @@ fn open_main_menu(state: &mut AppState){
     match cli_input::process_choice(3) {
         1 => {
             //TODO Invoke API, Start Calculations etc.
+            let driver_results = data_parser::request_drivers_results(&state.settings.championship_year).await;
+            let standings = recalculate_championship(&state.settings.point_system, driver_results.unwrap());
+            println!("\nChampionship Standings for {} year", state.settings.championship_year);
+            println!("{:<4} {:<25} {:>6}", "Pos", "Driver", "Points");
+            println!("{}", "-".repeat(37)); // separator
+
+            for (i, driver) in standings.iter().enumerate() {
+                println!(
+                    "{:<4} {:<25} {:>6}",
+                    i + 1,
+                    driver.full_name,
+                    driver.points_scored
+                );
+            }
+            Box::pin(open_main_menu(state)).await;
         }
-        2 => open_configuration_menu(state),
+        2 => Box::pin(open_configuration_menu(state)).await,
         3 => exit(0),
         _ => println!("Invalid data")
     }
 }
 
-fn open_configuration_menu(state: &mut AppState) {
+async fn open_configuration_menu(state: &mut AppState) {
     println!(
         "\nPlease select an option:\n\
         [1] - Select a championship year\n\
@@ -39,27 +57,27 @@ fn open_configuration_menu(state: &mut AppState) {
             println!("Please type a year between 1950 and 2025:");
             state.settings.championship_year = cli_input::input_championship_year();
             println!("\nChampionship year configuration saved successfully");
-            open_configuration_menu(state);
+            Box::pin(open_configuration_menu(state)).await;
         },
         2 => {
-            open_point_system_config(state);
+            Box::pin(open_point_system_config(state)).await;
         },
         3 => {
             let file_path = cli_input::input_file_directory();
             state.settings.point_system = config_parser::parse_config(&file_path);
             println!("\nPoint system configuration saved successfully");
-            open_configuration_menu(state);
+            Box::pin(open_configuration_menu(state)).await;
         },
         4 => {
             state.settings.view_settings();
-            open_configuration_menu(state);
+            Box::pin(open_configuration_menu(state)).await;
         },
-        5 => open_main_menu(state),
+        5 => open_main_menu(state).await,
         _ => println!("Invalid data")
     }
 }
 
-fn open_point_system_config(state: &mut AppState){
+async fn open_point_system_config(state: &mut AppState){
     println!("\
             Please select an existing point system:\n\
             [1] - Modern system\n\
@@ -87,5 +105,5 @@ fn open_point_system_config(state: &mut AppState){
         },
         _ => println!("Invalid data")
     }
-    open_configuration_menu(state);
+    Box::pin(open_configuration_menu(state)).await;
 }

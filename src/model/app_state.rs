@@ -6,6 +6,6 @@ pub struct AppState {
 }
 impl AppState {
     pub fn new(settings: Settings) -> Self {
-        Self { settings }
+        Self { settings}
     }
 }

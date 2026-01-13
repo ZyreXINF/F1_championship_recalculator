@@ -103,8 +103,8 @@ async fn open_point_system_config(state: &mut AppState){
             Please select an existing point system:\n\
             [1] - Modern system\n\
             [2] - Modern system (+ Fastest lap point)\n\
-            [3] - 2003-2009\n\
-            [4] - 1991–2002
+            [3] - Classic\n\
+            [4] - Legacy
     ");
     match cli_input::process_choice(4) {
         1 => {

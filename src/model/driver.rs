@@ -1,4 +1,5 @@
 #[derive(Debug)]
+#[derive(Clone)]
 pub struct Driver{
     pub finish_history: Vec<u8>,
     pub sprint_finish_history: Vec<u8>,

@@ -21,12 +21,17 @@ async fn open_main_menu(state: &mut AppState){
     ");
     match cli_input::process_choice(3) {
         1 => {
-            //TODO Memorize results for speed
             println!("\nFetching results for {} championship...", state.settings.championship_year);
-            let driver_results = data_parser::request_drivers_results(&state.settings.championship_year).await;
 
-            println!("\nRecalculating {} championship...", state.settings.championship_year);
-            let standings = recalculate_championship(&state.settings.point_system, driver_results.unwrap());
+            let driver_results = if let Some(results) = state.race_results.saved.get(&state.settings.championship_year) { results.clone() }
+                else{
+                    let results = data_parser::request_drivers_results(&state.settings.championship_year).await.unwrap();
+                    state.race_results.saved.insert(state.settings.championship_year, results.clone());
+                    results
+                };
+
+                println!("\nRecalculating {} championship...", state.settings.championship_year);
+            let standings = recalculate_championship(&state.settings.point_system, driver_results);
             Box::pin(view_standings(state, standings)).await;
 
             Box::pin(open_main_menu(state)).await;

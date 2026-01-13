@@ -1,5 +1,7 @@
 fastest_lap_point = 0
+sprint_fastest_lap_point = 0
 pole_point = 0
+sprint_pole_point = 0
 
 [gp_point_allocation]
 1 = 10

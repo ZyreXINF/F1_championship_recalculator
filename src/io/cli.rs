@@ -3,6 +3,7 @@ use crate::model::app_state::AppState;
 use crate::io::cli_input;
 use crate::io::config_parser;
 use crate::api::data_parser;
+use crate::model::driver::ChampionshipPosition;
 use crate::service::calculator::recalculate_championship;
 
 #[tokio::main]
@@ -20,26 +21,41 @@ async fn open_main_menu(state: &mut AppState){
     ");
     match cli_input::process_choice(3) {
         1 => {
-            //TODO Invoke API, Start Calculations etc.
+            //TODO Memorize results for speed
+            println!("\nFetching results for {} championship...", state.settings.championship_year);
             let driver_results = data_parser::request_drivers_results(&state.settings.championship_year).await;
-            let standings = recalculate_championship(&state.settings.point_system, driver_results.unwrap());
-            println!("\nChampionship Standings for {} year", state.settings.championship_year);
-            println!("{:<4} {:<25} {:>6}", "Pos", "Driver", "Points");
-            println!("{}", "-".repeat(37)); // separator
 
-            for (i, driver) in standings.iter().enumerate() {
-                println!(
-                    "{:<4} {:<25} {:>6}",
-                    i + 1,
-                    driver.full_name,
-                    driver.points_scored
-                );
-            }
+            println!("\nRecalculating {} championship...", state.settings.championship_year);
+            let standings = recalculate_championship(&state.settings.point_system, driver_results.unwrap());
+            Box::pin(view_standings(state, standings)).await;
+
             Box::pin(open_main_menu(state)).await;
         }
         2 => Box::pin(open_configuration_menu(state)).await,
         3 => exit(0),
         _ => println!("Invalid data")
+    }
+}
+
+async fn view_standings(state: &AppState, standings: Vec<ChampionshipPosition>) {
+    println!("\nChampionship Standings for {} year", state.settings.championship_year);
+    println!("{:<4} {:<25} {:>6} {:>3} {:>4} {:>4} {:>5} {:>4} {:>5}",
+        "Pos", "Driver", "Pts", "W", "SW", "FL", "FL(S)", "Pol", "Pol(S)");
+    println!("{}", "-".repeat(70));
+
+    for (i, driver) in standings.iter().enumerate() {
+        println!(
+            "{:<4} {:<25} {:>6} {:>3} {:>4} {:>4} {:>5} {:>4} {:>5}",
+            i + 1,
+            driver.full_name,
+            driver.points_scored,
+            driver.wins,
+            driver.sprint_wins,
+            driver.fastest_laps,
+            driver.sprint_fastest_laps,
+            driver.poles,
+            driver.sprint_poles
+        );
     }
 }
 

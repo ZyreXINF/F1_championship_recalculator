@@ -108,21 +108,21 @@ async fn open_point_system_config(state: &mut AppState){
     ");
     match cli_input::process_choice(4) {
         1 => {
-            state.settings.point_system = config_parser::parse_config("default_configs/modern.toml");
+            state.settings.point_system = config_parser::parse_embedded_config("modern");
             println!("\nModern system configuration saved successfully");
         },
         2 => {
-            state.settings.point_system = config_parser::parse_config("default_configs/modern.toml");
+            state.settings.point_system = config_parser::parse_embedded_config("modern");
             state.settings.point_system.fastest_lap_point = 1;
             println!("\nModern system configuration (+ Fastest lap point) saved successfully");
         },
         3 => {
-            state.settings.point_system = config_parser::parse_config("default_configs/f1_2003_2009.toml");
-            println!("\n2003-2009 system configuration saved successfully");
+            state.settings.point_system = config_parser::parse_embedded_config("classic");
+            println!("\nClassic system configuration saved successfully");
         },
         4 => {
-            state.settings.point_system = config_parser::parse_config("default_configs/f1_1991_2002.toml");
-            println!("\n1991-2002 system configuration saved successfully");
+            state.settings.point_system = config_parser::parse_embedded_config("legacy");
+            println!("\nLegacy system configuration saved successfully");
         },
         _ => println!("Invalid data")
     }
